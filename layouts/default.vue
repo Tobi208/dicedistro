@@ -1,10 +1,10 @@
 <template>
-  <root>
+  <div id="app">
     <header>
       <h1>D&amp;D Dice Distributions</h1>
     </header>
     <Nuxt />
-  </root>
+  </div>
 </template>
 
 <script>
@@ -25,11 +25,11 @@ html, body, #__nuxt, #__layout
   display: flex
   justify-content: center
 
-root
+#app
   display: flex
   flex-direction: column
   gap: 15px
   align-items: center
-  max-width: 800px
+  max-width: 1200px
   width: 100%
 </style>

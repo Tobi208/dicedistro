@@ -1,7 +1,7 @@
 <template>
   <main>
 
-    <div v-show="state === 'config'" class="config">
+    <div v-show="state !== 'calc'" ref="config" class="config">
 
       <div class="top-box">
         <button @click="addDC()">Add Config</button>
@@ -18,15 +18,17 @@
         <button v-show="diceConfigs.length > 1" class="x" @click="deleteDC(index)">X</button>
 
         <div class="polyhedrons flex-break">
-          <div v-for="(d, index2) in dc.dice" :key="index2" class="polyhedron-wrapper">
-                <label :class="{ glow: d.active }" ><input v-show="false" v-model="d.active" type="checkbox" @change="updateDC(index)" /><component :is="'d' + i2d[index2] + 'svg'" class="polyhedron"/></label>
+          <div v-for="(d, index2) in dc.dice" :key="index2">
+            <label :class="{ glow: d.active }"><input v-show="false" v-model="d.active" type="checkbox" @change="updateDC(index)" />
+              <component :is="'d' + i2d[index2] + 'svg'" class="polyhedron" />
+            </label>
           </div>
         </div>
 
-        <div v-for="(d, index2) in dc.dice" v-show="d.active" :key="index2" class="dice-box">
-          
+        <div v-for="(d, index2) in dc.dice" v-show="d.active" :key="index + '' + index2" class="dice-box">
+
           <div class="title flex-break">d{{ d.v }}</div>
-          
+
           <div class="number-box roll">
             <div class="subtitle flex-break">Roll</div>
             <div class="plus-minus-box">
@@ -35,8 +37,8 @@
             </div>
             <input v-model="d.n" class="short-number flex-break" @change="filterN(index, index2)" />
             <div class="footer-toggle-box">
-              <label :class="{ selected: !d.add, 'ftb-left': true}" ><input v-show="false" v-model="d.add" type="radio" :value="false" @change="updateDC(index)" />Sub</label>
-              <label :class="{ selected: d.add, 'ftb-right': true}" ><input v-show="false" v-model="d.add" type="radio" :value="true" @change="updateDC(index)" />Add</label>
+              <label :class="{ selected: !d.add, 'ftb-left': true }"><input v-show="false" v-model="d.add" type="radio" :value="false" @change="updateDC(index)" />Sub</label>
+              <label :class="{ selected: d.add, 'ftb-right': true }"><input v-show="false" v-model="d.add" type="radio" :value="true" @change="updateDC(index)" />Add</label>
             </div>
           </div>
 
@@ -49,8 +51,8 @@
             <p>&#8804;</p>
             <input v-model="d.rr" type="text" class="short-number flex-break" @change="filterRR(index, index2)" />
             <div class="footer-toggle-box">
-              <label :class="{ selected:  !d.rrO, 'ftb-left': true}" ><input v-show="false" v-model="d.rrO" type="radio" :value="false" @change="updateDC(index, index2)" />Always</label>
-              <label :class="{ selected:  d.rrO, 'ftb-right': true}" ><input v-show="false" v-model="d.rrO" type="radio" :value="true" @change="updateDC(index, index2)" />Once</label>
+              <label :class="{ selected: !d.rrO, 'ftb-left': true }"><input v-show="false" v-model="d.rrO" type="radio" :value="false" @change="updateDC(index, index2)" />Always</label>
+              <label :class="{ selected: d.rrO, 'ftb-right': true }"><input v-show="false" v-model="d.rrO" type="radio" :value="true" @change="updateDC(index, index2)" />Once</label>
             </div>
           </div>
 
@@ -72,11 +74,23 @@
             <input v-model="d.mod" type="text" class="short-number" @change="filterMod(index, index2)" />
           </div>
 
-          <div class="advantage footer-toggle-box">
-            <label :class="{ selected:  d.adv === 'disadv', 'ftb-left': true}" ><input v-show="false" v-model="d.adv" type="radio" value="disadv" @click="checkAdv(index, index2, 'disadv')" />Disadvantage</label>
-            <label :class="{ selected:  d.adv === 'adv', 'ftb-right': true}" ><input v-show="false" v-model="d.adv" type="radio" value="adv" @click="checkAdv(index, index2, 'adv')" />Advantage</label>
+          <div class="advantage footer-toggle-box flex-break">
+            <label :class="{ selected: d.adv === 'disadv', 'ftb-left': true }"><input v-show="false" v-model="d.adv" type="radio" value="disadv" @click="checkAdv(index, index2, 'disadv')" />Disadvantage</label>
+            <label :class="{ selected: d.adv === 'adv', 'ftb-right': true }"><input v-show="false" v-model="d.adv" type="radio" value="adv" @click="checkAdv(index, index2, 'adv')" />Advantage</label>
           </div>
 
+        </div>
+
+        <div v-if="index < graphData.length" :key="index + '' + graphKey" class="graph" >
+          <vue-bar-graph
+            :points="graphData[index]"
+            :width="graphWidth"
+            :height="200"
+            :show-y-axis="true"
+            :show-x-axis="true"
+            bar-color="#ffbffb"
+            :max-y-axis="maxY"
+          />
         </div>
 
       </div>
@@ -85,22 +99,7 @@
 
 
     <div v-show="state === 'calc'">
-
-
-    </div>
-
-
-    <div v-show="state === 'graph'" class="graphs">
-      <div v-for="(data, index) in graphData" :key="index" class="graph">
-        <vue-bar-graph
-          :points="data"
-          :width="800"
-          :height="200"
-          :show-y-axis="true"
-          :show-x-axis="true"
-          :max-y-axis="maxY"
-        />
-      </div>
+      <p>Rolling a whole lot of math rocks!</p>
     </div>
 
   </main>
@@ -126,26 +125,26 @@ export default {
   data() {
     const baseDiceConfig = {
       dice: [
-        { v:   4, n: 0, add: true, rr: 0, rrO: true, adv: '', prevAdv: '', dl: 0, mod: 0, active: false },
-        { v:   6, n: 0, add: true, rr: 0, rrO: true, adv: '', prevAdv: '', dl: 0, mod: 0, active: false },
-        { v:   8, n: 0, add: true, rr: 0, rrO: true, adv: '', prevAdv: '', dl: 0, mod: 0, active: false },
-        { v:  10, n: 0, add: true, rr: 0, rrO: true, adv: '', prevAdv: '', dl: 0, mod: 0, active: false },
-        { v:  12, n: 0, add: true, rr: 0, rrO: true, adv: '', prevAdv: '', dl: 0, mod: 0, active: false },
-        { v:  20, n: 0, add: true, rr: 0, rrO: true, adv: '', prevAdv: '', dl: 0, mod: 0, active: false },
+        { v: 4, n: 0, add: true, rr: 0, rrO: true, adv: '', prevAdv: '', dl: 0, mod: 0, active: false },
+        { v: 6, n: 0, add: true, rr: 0, rrO: true, adv: '', prevAdv: '', dl: 0, mod: 0, active: false },
+        { v: 8, n: 0, add: true, rr: 0, rrO: true, adv: '', prevAdv: '', dl: 0, mod: 0, active: false },
+        { v: 10, n: 0, add: true, rr: 0, rrO: true, adv: '', prevAdv: '', dl: 0, mod: 0, active: false },
+        { v: 12, n: 0, add: true, rr: 0, rrO: true, adv: '', prevAdv: '', dl: 0, mod: 0, active: false },
+        { v: 20, n: 0, add: true, rr: 0, rrO: true, adv: '', prevAdv: '', dl: 0, mod: 0, active: false },
         { v: 100, n: 0, add: true, rr: 0, rrO: true, adv: '', prevAdv: '', dl: 0, mod: 0, active: false },
-      ], 
+      ],
       minR: 0, maxR: 0,
     }
     return {
       state: 'config',
       sampleSize: 10000,
-      minVal: 0,
-      maxVal: 0,
       maxY: 0,
       baseDiceConfig,
       i2d: { 0: 4, 1: 6, 2: 8, 3: 10, 4: 12, 5: 20, 6: 100 },
-      diceConfigs: [ JSON.parse(JSON.stringify(baseDiceConfig)) ],
+      diceConfigs: [JSON.parse(JSON.stringify(baseDiceConfig))],
       graphData: [],
+      // https://michaelnthiessen.com/force-re-render/
+      graphKey: 0,
     }
   },
   head() {
@@ -158,7 +157,7 @@ export default {
       if (this.diceConfigs.length === 0)
         return 0
       let min = Number.MAX_SAFE_INTEGER
-      this.diceConfigs.forEach( dc => {
+      this.diceConfigs.forEach(dc => {
         min = min < dc.minR ? min : dc.minR
       })
       return min
@@ -167,11 +166,14 @@ export default {
       if (this.diceConfigs.length === 0)
         return 0
       let max = Number.MIN_SAFE_INTEGER
-      this.diceConfigs.forEach( dc => {
+      this.diceConfigs.forEach(dc => {
         max = max > dc.maxR ? max : dc.maxR
       })
       return max
-
+    },
+    graphWidth() {
+      // https://stackoverflow.com/questions/46345947/vuejs-get-width-of-div
+      return this.$refs.config.clientWidth - 50
     },
   },
   methods: {
@@ -184,62 +186,138 @@ export default {
     },
 
     addDC() {
-      this.diceConfigs.push( JSON.parse(JSON.stringify(this.baseDiceConfig)) )
+      this.diceConfigs.push(JSON.parse(JSON.stringify(this.baseDiceConfig)))
     },
 
     calculate() {
 
-      // TODO DEV REROLLS DROP ADVANTAGE DISADVANTAGE SUB ADD FUCK YOU
-
+      this.state = 'calc'
       this.graphData = []
+      // https://michaelnthiessen.com/force-re-render/
+      this.graphKey++
 
       // universal axis initial values
       const y = {}
-      for (let i = this.minVal; i <= this.maxVal; i++)
+      for (let i = this.minRoll; i <= this.maxRoll; i++)
         y[i] = 0
 
       let j = 0
       let v = 0
-      let k = 0     
+      let k = 0
+      let l = 0
       let points = []
       let maxY = Number.MIN_SAFE_INTEGER
+      let data = {}
+      let dice = []
+      let roll = 0
+      let roll2 = 0
+      let lowest = 0
+      const rolls = {}
+
+      let i = 0
+      while (i < this.diceConfigs.length) {
+        if (!this.diceConfigs[i].minR && !this.diceConfigs[i].maxR)
+          this.diceConfigs.splice(i, 1)
+        else
+          i++
+      }
+      if (this.diceConfigs.length === 0) {
+        this.diceConfigs.push( JSON.parse(JSON.stringify(this.baseDiceConfig)) )
+        this.state = 'not-calc'
+        return
+      }
 
       // random values
-      this.diceConfigs.forEach((dc, i) => {
 
-        this.graphData.push({ ...y })
-        
+      this.diceConfigs.forEach(dc => {
+
+        dice = dc.dice.filter(d => d.active && (d.n || d.mod))
+        data = { ...y }
+
+        dice.forEach(d => {
+          rolls[d.v] = new Array(d.n)
+        })
+
         for (k = 0; k < this.sampleSize; k++) {
+
           v = 0
-          for (j = 0; j < dc.d4; j++)
-            v += this.getRandInt(4)
-          for (j = 0; j < dc.d6; j++)
-            v += this.getRandInt(6)
-          for (j = 0; j < dc.d8; j++)
-            v += this.getRandInt(8)
-          for (j = 0; j < dc.d10; j++)
-            v += this.getRandInt(10)
-          for (j = 0; j < dc.d12; j++)
-            v += this.getRandInt(12)
-          for (j = 0; j < dc.d20; j++)
-            v += this.getRandInt(20)
-          for (j = 0; j < dc.d100; j++)
-            v += this.getRandInt(100)
-          v += dc.mod
-          this.graphData[i][v]++
+
+          dice.forEach(d => {
+
+            for (j = 0; j < d.n; j++) {
+
+              if (d.rr && !d.rrO)
+                roll = Math.floor(Math.random() * (d.v - d.rr)) + d.rr + 1
+
+              else if (d.rr && d.rrO) {
+                roll = Math.floor(Math.random() * d.v) + 1
+                if (roll <= d.rr)
+                  roll = Math.floor(Math.random() * d.v) + 1
+
+              } else
+                roll = Math.floor(Math.random() * d.v) + 1
+
+              if (d.adv === 'adv' || d.adv === 'disadv') {
+
+                if (d.rr && !d.rrO)
+                  roll2 = Math.floor(Math.random() * (d.v - d.rr)) + d.rr + 1
+
+                else if (d.rr && d.rr0) {
+                  roll2 = Math.floor(Math.random() * d.v) + 1
+                  if (roll2 <= d.rr)
+                    roll2 = Math.floor(Math.random() * d.v) + 1
+
+                } else
+                  roll2 = Math.floor(Math.random() * d.v) + 1
+
+                if (d.adv === 'adv')
+                  roll = roll > roll2 ? roll : roll2
+                else
+                  roll = roll < roll2 ? roll : roll2
+
+              }
+
+              rolls[d.v][j] = roll
+            }
+
+            if (d.dl) {
+
+              for (l = 0; l < d.dl; l++) {
+
+                lowest = 0
+
+                for (j = 1; j < d.n; j++)
+                  if ((rolls[d.v][j] > 0 && rolls[d.v][j] < rolls[d.v][j - 1]) || rolls[d.v][j - 1] === 0)
+                    lowest = j
+
+                rolls[d.v][lowest] = 0
+
+              }
+
+            }
+
+            for (j = 0; j < d.n; j++)
+              v += rolls[d.v][j]
+            v += d.mod
+            if (!d.add)
+              v *= -1
+
+          })
+
+          data[v]++
         }
 
         points = []
-        Object.entries(this.graphData[i]).forEach( (e) => {
+        Object.entries(data).forEach((e) => {
           v = Math.round(e[1] / this.sampleSize * 10000) / 100
           maxY = maxY > v ? maxY : v
           points.push({ label: e[0], value: v })
         })
-        this.graphData[i] = points
+        this.graphData.push(points)
       })
 
       this.maxY = Math.ceil(maxY)
-      this.state = 'graph'
+      this.state = 'not-calc'
     },
 
 
@@ -248,6 +326,7 @@ export default {
     deleteDC(i) {
       if (this.diceConfigs.length > 1) {
         this.diceConfigs.splice(i, 1)
+        this.graphData.splice(i, 1)
       }
     },
 
@@ -260,7 +339,7 @@ export default {
       this.diceConfigs[i].dice.forEach(d => {
         if (!d.active || (d.n === 0 && d.mod === 0))
           return
-        
+
         if (!d.rrO && d.rr > 0) {
           minR = (d.n - d.dl) * (d.rr + 1)
         } else {
@@ -275,7 +354,7 @@ export default {
           sumMinR -= maxR + d.mod
           sumMaxR -= minR + d.mod
         }
-        
+
       })
 
       this.diceConfigs[i].minR = sumMinR
@@ -285,7 +364,7 @@ export default {
 
     // enforce max Rerolls and Drops
 
-    updateD(i, j) {        
+    updateD(i, j) {
       const mDL = this.maxDL(i, j)
       if (this.diceConfigs[i].dice[j].n > mDL)
         this.diceConfigs[i].dice[j].dl = mDL
@@ -426,13 +505,6 @@ export default {
     checkAdv(i, j, v) {
       this.diceConfigs[i].dice[j].adv = v === this.diceConfigs[i].dice[j].prevAdv ? '' : v
       this.diceConfigs[i].dice[j].prevAdv = this.diceConfigs[i].dice[j].adv
-    },
-
-
-    // --- Utility ---
-
-    getRandInt(max) {
-      return Math.floor(Math.random() * max) + 1
     },
 
   },
@@ -625,10 +697,9 @@ main
       .ftb-right
         border-left: 1px solid $main-border-color
 
-.graphs
-  @inlcude flex-col-layout
-
 .graph
+  width: 100%
+  flex-basis: 100%
   padding: 15px
   @include flex-row-layout
 
