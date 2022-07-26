@@ -1,31 +1,30 @@
 <template>
   <main>
 
-    <div v-show="state !== 'calc'" ref="config" class="config">
+    <div ref="config" :class="{config: true, shrink: shrink, grow: grow}">
 
       <div class="top-box">
-        <button @click="addDC()">Add Config</button>
-        <button class="flex-break" @click="calculate()">Simulate Distribution</button>
+        <button @click="addDC()">Add Dice Config</button>
         <div class="sample-size">
           <label for="sample-size">Sample Size</label>
           <input id="sample-size" v-model="sampleSize" type="text" @change="filterSampleSize()" />
         </div>
-        <div class="val-range">Value Range [{{ minRoll }}, {{ maxRoll }}]</div>
+        <button class="flex-break" @click="calculate()">Simulate Distribution</button>
       </div>
 
-      <div v-for="(dc, index) in diceConfigs" :key="index" class="dice-config">
+      <div v-for="(dc, index) in diceConfigs" :key="'dc' + index" class="dice-config">
 
         <button v-show="diceConfigs.length > 1" class="x" @click="deleteDC(index)">X</button>
 
         <div class="polyhedrons flex-break">
-          <div v-for="(d, index2) in dc.dice" :key="index2">
+          <div v-for="(d, index2) in dc.dice" :key="'poly' + index + '' + index2">
             <label :class="{ glow: d.active }"><input v-show="false" v-model="d.active" type="checkbox" @change="updateDC(index)" />
               <component :is="'d' + i2d[index2] + 'svg'" class="polyhedron" />
             </label>
           </div>
         </div>
 
-        <div v-for="(d, index2) in dc.dice" v-show="d.active" :key="index + '' + index2" class="dice-box">
+        <div v-for="(d, index2) in dc.dice" v-show="d.active" :key="'d' + index + '' + index2" class="dice-box">
 
           <div class="title flex-break">d{{ d.v }}</div>
 
@@ -81,7 +80,7 @@
 
         </div>
 
-        <div v-if="index < graphData.length" :key="index + '' + graphKey" class="graph" >
+        <div v-if="index < graphData.length" :key="'graph' + index + '' + graphKey" class="graph" >
           <vue-bar-graph
             :points="graphData[index]"
             :width="graphWidth"
@@ -90,6 +89,7 @@
             :show-x-axis="true"
             bar-color="#ffbffb"
             :max-y-axis="maxY"
+            :ease-in="false"
           />
         </div>
 
@@ -98,8 +98,8 @@
     </div>
 
 
-    <div v-show="state === 'calc'">
-      <p>Rolling a whole lot of math rocks!</p>
+    <div :class="{'rolling-message': true, calculating: calculating}">
+      <p>Rolling all of the math rocks!</p>
     </div>
 
   </main>
@@ -136,7 +136,9 @@ export default {
       minR: 0, maxR: 0,
     }
     return {
-      state: 'config',
+      shrink: false,
+      grow: false,
+      calculating: false,
       sampleSize: 10000,
       maxY: 0,
       baseDiceConfig,
@@ -145,6 +147,132 @@ export default {
       graphData: [],
       // https://michaelnthiessen.com/force-re-render/
       graphKey: 0,
+      graphWidth: 0,
+
+      // https://www.npmjs.com/package/vue-worker
+      // yes it has to be in data and not in methods
+      simulate: (diceConfigs, minRoll, maxRoll, sampleSize) => {
+
+        let i = 0
+        let j = 0
+        let v = 0
+        let vd = 0
+        let k = 0
+        let l = 0
+        let maxY = Number.MIN_SAFE_INTEGER
+        let points = []
+        let data = {}
+        let dice = []
+        let roll = 0
+        let roll2 = 0
+        let lowest = 0
+        const rolls = {}
+        const graphData = []
+
+        diceConfigs.forEach((dc) => {
+          
+          dice = dc.dice.filter((d) => d.active && (d.n || d.mod))
+          data = { }
+          for (i = minRoll; i <= maxRoll; i++)
+            data[i] = 0
+          
+          dice.forEach((d) => {
+            rolls[d.v] = new Array(d.n)
+          })
+          
+          for (k = 0; k < sampleSize; k++) {
+            
+            v = 0
+            
+            dice.forEach((d) => {
+
+              for (j = 0; j < d.n; j++) {
+
+                // first roll considering rerolls
+
+                if (d.rr && !d.rrO)
+                  roll = Math.floor(Math.random() * (d.v - d.rr)) + d.rr + 1
+
+                else if (d.rr && d.rrO) {
+                  roll = Math.floor(Math.random() * d.v) + 1
+                  if (roll <= d.rr)
+                    roll = Math.floor(Math.random() * d.v) + 1
+
+                } else
+                  roll = Math.floor(Math.random() * d.v) + 1
+
+                // second roll considering rerolls
+
+                if (d.adv === 'adv' || d.adv === 'disadv') {
+
+                  if (d.rr && !d.rrO)
+                    roll2 = Math.floor(Math.random() * (d.v - d.rr)) + d.rr + 1
+
+                  else if (d.rr && d.rr0) {
+                    roll2 = Math.floor(Math.random() * d.v) + 1
+                    if (roll2 <= d.rr)
+                      roll2 = Math.floor(Math.random() * d.v) + 1
+
+                  } else
+                    roll2 = Math.floor(Math.random() * d.v) + 1
+
+                  if (d.adv === 'adv')
+                    roll = roll > roll2 ? roll : roll2
+                  else
+                    roll = roll < roll2 ? roll : roll2
+
+                }
+
+                rolls[d.v][j] = roll
+              }
+
+              // drop lowest rolls
+
+              if (d.dl) {
+                for (l = 0; l < d.dl; l++) {
+                  lowest = 0
+                  for (j = 1; j < d.n; j++)
+                    if ((rolls[d.v][j] > 0 && rolls[d.v][j] < rolls[d.v][j - 1]) || rolls[d.v][j - 1] === 0)
+                      lowest = j
+                  rolls[d.v][lowest] = 0
+                }
+              }
+
+              // apply factor and modifier
+
+              vd = 0
+
+              for (j = 0; j < d.n; j++)
+                vd += rolls[d.v][j]
+              vd += d.mod
+              if (d.add)
+                v += vd
+              else
+                v -= vd
+
+            })
+
+            // register data point
+
+            data[v]++
+
+          }
+
+          // convert data to graph points
+
+          points = []
+          for (i = minRoll; i <= maxRoll; i++) {
+            v = Math.round(data[i] / sampleSize * 10000) / 100
+            points.push({ label: i, value: v })  
+            if (v > maxY)
+              maxY = v          
+          }
+          graphData.push(points)
+        })
+
+        maxY = Math.ceil(maxY)
+        return { graphData, maxY }
+      },
     }
   },
   head() {
@@ -171,10 +299,10 @@ export default {
       })
       return max
     },
-    graphWidth() {
-      // https://stackoverflow.com/questions/46345947/vuejs-get-width-of-div
-      return this.$refs.config.clientWidth - 50
-    },
+  },
+  mounted() {
+    // https://stackoverflow.com/questions/46345947/vuejs-get-width-of-div
+    this.graphWidth = this.$refs.config.clientWidth - 50
   },
   methods: {
 
@@ -189,31 +317,7 @@ export default {
       this.diceConfigs.push(JSON.parse(JSON.stringify(this.baseDiceConfig)))
     },
 
-    calculate() {
-
-      this.state = 'calc'
-      this.graphData = []
-      // https://michaelnthiessen.com/force-re-render/
-      this.graphKey++
-
-      // universal axis initial values
-      const y = {}
-      for (let i = this.minRoll; i <= this.maxRoll; i++)
-        y[i] = 0
-
-      let j = 0
-      let v = 0
-      let k = 0
-      let l = 0
-      let points = []
-      let maxY = Number.MIN_SAFE_INTEGER
-      let data = {}
-      let dice = []
-      let roll = 0
-      let roll2 = 0
-      let lowest = 0
-      const rolls = {}
-
+    async calculate() {
       let i = 0
       while (i < this.diceConfigs.length) {
         if (!this.diceConfigs[i].minR && !this.diceConfigs[i].maxR)
@@ -222,102 +326,32 @@ export default {
           i++
       }
       if (this.diceConfigs.length === 0) {
-        this.diceConfigs.push( JSON.parse(JSON.stringify(this.baseDiceConfig)) )
-        this.state = 'not-calc'
+        this.diceConfigs.push(JSON.parse(JSON.stringify(this.baseDiceConfig)))
         return
       }
 
-      // random values
-
-      this.diceConfigs.forEach(dc => {
-
-        dice = dc.dice.filter(d => d.active && (d.n || d.mod))
-        data = { ...y }
-
-        dice.forEach(d => {
-          rolls[d.v] = new Array(d.n)
+      this.shrink = true
+      await this.sleep(250)
+      this.calculating = true
+      this.grow = true
+      this.graphData = []
+      
+      let worker = this.$worker.create([{ message: 'simulate', func: this.simulate }])
+      worker.postMessage('simulate', [this.diceConfigs, this.minRoll, this.maxRoll, this.sampleSize])
+        .then(({graphData, maxY}) => {
+          this.calculating = false
+          this.shrink = false
+          this.grow = false
+          this.maxY = maxY
+          this.graphData = graphData
+          this.graphKey++
+          worker = null
         })
-
-        for (k = 0; k < this.sampleSize; k++) {
-
-          v = 0
-
-          dice.forEach(d => {
-
-            for (j = 0; j < d.n; j++) {
-
-              if (d.rr && !d.rrO)
-                roll = Math.floor(Math.random() * (d.v - d.rr)) + d.rr + 1
-
-              else if (d.rr && d.rrO) {
-                roll = Math.floor(Math.random() * d.v) + 1
-                if (roll <= d.rr)
-                  roll = Math.floor(Math.random() * d.v) + 1
-
-              } else
-                roll = Math.floor(Math.random() * d.v) + 1
-
-              if (d.adv === 'adv' || d.adv === 'disadv') {
-
-                if (d.rr && !d.rrO)
-                  roll2 = Math.floor(Math.random() * (d.v - d.rr)) + d.rr + 1
-
-                else if (d.rr && d.rr0) {
-                  roll2 = Math.floor(Math.random() * d.v) + 1
-                  if (roll2 <= d.rr)
-                    roll2 = Math.floor(Math.random() * d.v) + 1
-
-                } else
-                  roll2 = Math.floor(Math.random() * d.v) + 1
-
-                if (d.adv === 'adv')
-                  roll = roll > roll2 ? roll : roll2
-                else
-                  roll = roll < roll2 ? roll : roll2
-
-              }
-
-              rolls[d.v][j] = roll
-            }
-
-            if (d.dl) {
-
-              for (l = 0; l < d.dl; l++) {
-
-                lowest = 0
-
-                for (j = 1; j < d.n; j++)
-                  if ((rolls[d.v][j] > 0 && rolls[d.v][j] < rolls[d.v][j - 1]) || rolls[d.v][j - 1] === 0)
-                    lowest = j
-
-                rolls[d.v][lowest] = 0
-
-              }
-
-            }
-
-            for (j = 0; j < d.n; j++)
-              v += rolls[d.v][j]
-            v += d.mod
-            if (!d.add)
-              v *= -1
-
-          })
-
-          data[v]++
-        }
-
-        points = []
-        Object.entries(data).forEach((e) => {
-          v = Math.round(e[1] / this.sampleSize * 10000) / 100
-          maxY = maxY > v ? maxY : v
-          points.push({ label: e[0], value: v })
+        .catch(() => { 
+          this.calculating = false
+          this.shrink = false
+          this.grow = false
         })
-        this.graphData.push(points)
-      })
-
-      this.maxY = Math.ceil(maxY)
-      this.state = 'not-calc'
     },
 
 
@@ -507,6 +541,11 @@ export default {
       this.diceConfigs[i].dice[j].prevAdv = this.diceConfigs[i].dice[j].adv
     },
 
+    sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    },
+
+
   },
 }
 </script>
@@ -535,36 +574,74 @@ $main-accent-color-light: #ffbffb
   box-sizing: border-box
 
 main
-  width: 95%
+  width: 90%
   @include flex-col-layout
   padding-bottom: 25px
+  overflow-x: hidden
+  position: relative
 
 .flex-break
   page-break-after: always
   break-after: always
 
+
+.rolling-message
+  opacity: 0
+  transition: opacity 1s ease
+
+.rolling-message.calculating
+  opacity: 1
+  position: absolute
+  top: 20px
+
+  
 .config
   @include flex-col-layout
   width: 100%
 
+  overflow: hidden
+  height: auto
+  
+  transform: translateX(0)
+  transform-origin: top
+
+  -webkit-transition: all 0.25s
+  -moz-transition: all 0.25s
+  transition: all 0.25s
+
+
+.config.shrink
+  transform: translateX(-100vw)
+  -webkit-transition: all 0.25s
+  -moz-transition: all 0.25s
+  transition: all 0.25s
+
+
+.config.grow
+  transform: translateX(100vw)
+  transition: none
+
+
 .top-box
-  @include flex-row-layout
+  @include flex-row-layout($justify: space-evenly)
   flex-wrap: wrap
   align-items: center
+  width: 100%
+  padding: 5px
 
   .sample-size input
     text-align: center
-    padding: 3px
+    padding: 5px
     border-radius: 5px
     border: 1px solid $main-border-color
     max-width: 100px
 
-  .min-val input, .max-val input
-    text-align: center
-    padding: 3px
-    border-radius: 5px
+  button
+    min-width: 150px
+    padding: 5px
+    background-color: white
     border: 1px solid $main-border-color
-    max-width: 100px
+    border-radius: 5px
 
 .dice-config
   width: 100%
@@ -597,6 +674,8 @@ main
     .polyhedron
       max-width: 32px
       max-height: 32px
+      *
+        stroke-width: 15px
 
     .glow *
       fill: $main-accent-color-light
