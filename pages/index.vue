@@ -87,7 +87,7 @@
             :height="200"
             :show-y-axis="true"
             :show-x-axis="true"
-            bar-color="#ffbffb"
+            bar-color="rgb(180, 120, 240)"
             :max-y-axis="maxY"
             :ease-in="false"
           />
@@ -139,7 +139,7 @@ export default {
       shrink: false,
       grow: false,
       calculating: false,
-      sampleSize: 10000,
+      sampleSize: 100000,
       maxY: 0,
       baseDiceConfig,
       i2d: { 0: 4, 1: 6, 2: 8, 3: 10, 4: 12, 5: 20, 6: 100 },
@@ -310,7 +310,7 @@ export default {
 
     filterSampleSize() {
       if (!this.sampleSize.toString().match(/\d+/g))
-        this.sampleSize = 10000
+        this.sampleSize = 100000
     },
 
     addDC() {
@@ -550,12 +550,11 @@ export default {
 }
 </script>
 
-<style lang="sass">
+<style scoped lang="sass">
 
-$main-border-color: darkgrey
-$main-background-color: lightgrey
-
-$main-accent-color-light: #ffbffb
+$light-black: rgb(50, 50, 50)
+$light-color: rgb(180, 120, 240)
+$dark-color: rgb(100, 50, 150)
 
 @mixin flex-col-layout($gap-size: 15px)
   display: flex
@@ -569,9 +568,19 @@ $main-accent-color-light: #ffbffb
   justify-content: $justify
   gap: $gap-size
 
+@mixin unselectable
+  -webkit-user-select: none 
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+
 *
-  font-family: Arial, Helvetica, sans-serif
+  font-family: Helvetica, Arial, sans-serif
   box-sizing: border-box
+  @include unselectable
+
+input
+  outline: none
 
 main
   width: 90%
@@ -587,7 +596,7 @@ main
 
 .rolling-message
   opacity: 0
-  transition: opacity 1s ease
+  transition: opacity 2s ease
 
 .rolling-message.calculating
   opacity: 1
@@ -603,17 +612,11 @@ main
   height: auto
   
   transform: translateX(0)
-  transform-origin: top
-
-  -webkit-transition: all 0.25s
-  -moz-transition: all 0.25s
   transition: all 0.25s
 
 
 .config.shrink
   transform: translateX(-100vw)
-  -webkit-transition: all 0.25s
-  -moz-transition: all 0.25s
   transition: all 0.25s
 
 
@@ -628,20 +631,35 @@ main
   align-items: center
   width: 100%
   padding: 5px
+  font-size: large
 
   .sample-size input
     text-align: center
-    padding: 5px
-    border-radius: 5px
-    border: 1px solid $main-border-color
-    max-width: 100px
+    padding: 8px
+    border-radius: 20px
+    border: 2px solid $dark-color
+    max-width: 150px
+    outline: none
+    font-size: large
 
   button
-    min-width: 150px
-    padding: 5px
-    background-color: white
-    border: 1px solid $main-border-color
-    border-radius: 5px
+    min-width: 200px
+    padding: 8px
+    border: 2px solid $dark-color
+    border-radius: 25px
+    font-size: large
+
+    background-color: $dark-color
+    color: white
+    transition: background-color 0.25s ease, color 0.25s ease
+
+    &:active
+      box-shadow: 0 0 3px $light-color
+
+    &:hover
+      cursor: pointer
+      background-color: white
+      color: black
 
 .dice-config
   width: 100%
@@ -649,11 +667,11 @@ main
   @include flex-row-layout($justify: center)
   flex-wrap: wrap
   padding: 10px
-  border: 1px solid $main-border-color
-  border-radius: 25px
+  border: 2px solid $dark-color
+  border-radius: 15px
 
   .selected
-    background-color: $main-background-color
+    background-color: $light-color
 
   .x
     position: absolute
@@ -661,11 +679,16 @@ main
     right: 10px
     width: 20px
     height: 20px
-    border: 1px solid $main-border-color
+    border: none
+    background-color: $dark-color
+    color: white
     border-radius: 50%
     text-align: center
-    font-size: small
     font-family: monospace
+
+    &:hover
+      cursor: pointer
+      box-shadow: 0 0 3px $light-color
 
   .polyhedrons
     @include flex-row-layout
@@ -676,16 +699,20 @@ main
       max-height: 32px
       *
         stroke-width: 15px
+    
+      &:hover
+        cursor: pointer
 
     .glow *
-      fill: $main-accent-color-light
+      fill: $light-color
 
   .dice-box
     @include flex-row-layout($justify: center)
     flex-wrap: wrap
     padding: 10px
-    border: 1px solid $main-border-color
-    border-radius: 15px
+    border: 1px solid $dark-color
+    border-radius: 20px
+    box-shadow: 0 0 2px $light-color
     max-width: 210px
 
     .title
@@ -700,7 +727,7 @@ main
       max-width: 85px
       min-height: 85px
       max-height: 85px
-      @include flex-row-layout($gap-size: 1px, $justify: center)
+      @include flex-row-layout($gap-size: 2px, $justify: center)
       flex-wrap: wrap
       align-items: center
 
@@ -715,27 +742,39 @@ main
         padding: 5px
         width: 25px
         height: 25px
-        border: none
+        border: 1px solid $dark-color
+        background-color: white
+
+        transition: background-color 0.15s ease, color 0.15s ease
+
+        &:hover
+          cursor: pointer
+          background-color: $dark-color
+          color: white
+
+        &:active
+          background-color: $light-color
 
       .minus
         border-radius: 0 0 50% 50%
+        border-top: none
 
       .plus
         border-radius: 50% 50% 0 0
+        border-bottom: none
 
       input.short-number
         width: 40px
         height: 40px
         text-align: center
         border-radius: 50%
-        border: 1px solid $main-border-color
+        border: 1px solid $dark-color
 
       .ftb-left, .ftb-right
         width: 35px
         font-size: small
 
     .reroll
-      gap: 2px
       min-width: 85px
       max-width: 85px
 
@@ -744,7 +783,7 @@ main
 
       input.short-number
         border: none
-        border-bottom: 1px solid $main-border-color
+        border-bottom: 1px solid $dark-color
         border-radius: 0
         height: 20px
         width: 30px
@@ -755,17 +794,23 @@ main
       gap: 0
 
       .ftb-left, .ftb-right
-        border: 1px solid $main-border-color
+        border: 1px solid $dark-color
         padding: 1px
         text-align: center
         font-family: monospace
+        transition: background-color 0.15s ease, color 0.15s ease
+
+        &:hover
+          cursor: pointer
+          background-color: $dark-color
+          color: white
       
       .ftb-right
-        border-radius: 0 5px 5px 0
+        border-radius: 0 7px 7px 0
         border-left: none
 
       .ftb-left
-        border-radius: 5px 0 0 5px
+        border-radius: 7px 0 0 7px
         border-right: none
     
     .advantage
@@ -774,13 +819,12 @@ main
         width: 95px
 
       .ftb-right
-        border-left: 1px solid $main-border-color
+        border-left: 1px solid $light-black
 
 .graph
   width: 100%
   flex-basis: 100%
   padding: 15px
   @include flex-row-layout
-
 
 </style>
