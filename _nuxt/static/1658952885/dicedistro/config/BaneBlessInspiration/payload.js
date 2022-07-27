@@ -1,1 +1,0 @@
-__NUXT_JSONP__("/dicedistro/config/BaneBlessInspiration", {data:[{}],fetch:{},mutations:void 0});
