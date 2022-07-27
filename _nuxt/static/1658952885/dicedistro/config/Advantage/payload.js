@@ -1,0 +1,1 @@
+__NUXT_JSONP__("/dicedistro/config/Advantage", {data:[{}],fetch:{},mutations:void 0});

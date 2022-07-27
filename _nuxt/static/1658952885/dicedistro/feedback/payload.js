@@ -1,0 +1,1 @@
+__NUXT_JSONP__("/dicedistro/feedback", {data:[{}],fetch:{},mutations:void 0});

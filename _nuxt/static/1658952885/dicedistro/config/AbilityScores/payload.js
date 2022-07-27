@@ -1,0 +1,1 @@
+__NUXT_JSONP__("/dicedistro/config/AbilityScores", {data:[{}],fetch:{},mutations:void 0});

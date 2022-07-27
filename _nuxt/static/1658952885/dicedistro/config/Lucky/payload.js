@@ -1,0 +1,1 @@
+__NUXT_JSONP__("/dicedistro/config/Lucky", {data:[{}],fetch:{},mutations:void 0});

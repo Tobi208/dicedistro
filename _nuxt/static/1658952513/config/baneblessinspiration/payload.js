@@ -1,1 +1,0 @@
-__NUXT_JSONP__("/config/baneblessinspiration", {data:[{}],fetch:{},mutations:void 0});
