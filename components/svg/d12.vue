@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<template>
 <svg version="1.1" viewBox="0 0 373.22 389.4" xmlns="http://www.w3.org/2000/svg">
 <g transform="translate(-1647 -400.79)">
 <g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-opacity=".98109" style="paint-order:normal">
@@ -12,3 +12,19 @@
 </g>
 </g>
 </svg>
+</template>
+
+<script>
+export default {
+  name: 'd12svg'
+}
+</script>
+
+<style scoped>
+svg * {
+  stroke-width: 15px;
+}
+.glow * {
+  fill: rgb(180, 120, 240);
+}
+</style>

@@ -1,22 +1,22 @@
 <template>
   <div id="app">
     <header>
-      <div id="h-title">D&amp;D Dice Distributions</div>
+      <nuxt-link id="h-home" to="/"><div id="h-title">D&amp;D Dice Distributions</div></nuxt-link>
       <div id="h-links">
         <nuxt-link to="/help">Help</nuxt-link>
-        <nuxt-link to="/config/abilityscore">Ability Scores</nuxt-link>
+        <nuxt-link to="/config/abilityscores">Ability Scores</nuxt-link>
         <nuxt-link to="/config/advantage">Advantage</nuxt-link>
         <nuxt-link to="/config/attackcombos">Attack Combos</nuxt-link>
-        <nuxt-link to="/config/banebless">Bane &amp; Bless</nuxt-link>
+        <nuxt-link to="/config/baneblessinspiration">Bane &amp; Bless &amp; Inspiration</nuxt-link>
         <nuxt-link to="/config/lucky">Lucky</nuxt-link>
       </div>
     </header>
     <Nuxt />
     <footer>
-      <nuxt-link to="/help">Help</nuxt-link>
       <div>v0.0.1</div>
       <div>by <a href="https://www.github.com/tobi208">Tobi208</a></div>
       <div>give <nuxt-link to="/feedback" target="_blank">Feedback</nuxt-link></div>
+      <nuxt-link to="/help">Help</nuxt-link>
     </footer>
   </div>
 </template>
@@ -24,6 +24,9 @@
 <script>
 export default {
   name: 'DefaultLayout',
+  head() {
+    return { title: 'DnD Dice Distro' }
+  }
 }
 </script>
 
@@ -74,6 +77,9 @@ html, body, #__nuxt, #__layout, #app
 
     border-bottom: 1px solid $light-black
 
+    #h-home
+      text-decoration: none
+
     #h-title
       font-family: Verdana, Geneva, Tahoma, sans-serif
       width: 100%
@@ -92,6 +98,7 @@ html, body, #__nuxt, #__layout, #app
     #h-links
       width: 100%
       display: flex
+      flex-wrap: wrap
       justify-content: space-evenly
       gap: 10px
 

@@ -121,7 +121,7 @@ import d20svg from '@/components/svg/d20.vue'
 import d100svg from '@/components/svg/d100.vue'
 
 export default {
-  name: 'IndexPage',
+  name: 'LuckyPage',
   components: {
     VueBarGraph,
     d4svg, d6svg, d8svg, d10svg, d12svg, d20svg, d100svg,
@@ -143,12 +143,12 @@ export default {
       shrink: false,
       grow: false,
       calculating: false,
-      sampleSize: 100000,
-      maxY: 0,
+      sampleSize: 1000000,
+      maxY: 6,
       baseDiceConfig,
       i2d: { 0: 4, 1: 6, 2: 8, 3: 10, 4: 12, 5: 20, 6: 100 },
-      diceConfigs: [JSON.parse(JSON.stringify(baseDiceConfig))],
-      graphData: [],
+      diceConfigs: [{"title":"You are a lucky Halfling","dice":[{"v":4,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":6,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":8,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":10,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":12,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":20,"n":1,"add":true,"rr":1,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":true},{"v":100,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false}],"minR":1,"maxR":20},{"title":"You are not a lucky Halfling","dice":[{"v":4,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":6,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":8,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":10,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":12,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":20,"n":1,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":true},{"v":100,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false}],"minR":1,"maxR":20}],
+      graphData: [[{"label":1,"value":0.25},{"label":2,"value":5.28},{"label":3,"value":5.26},{"label":4,"value":5.27},{"label":5,"value":5.25},{"label":6,"value":5.26},{"label":7,"value":5.27},{"label":8,"value":5.26},{"label":9,"value":5.24},{"label":10,"value":5.25},{"label":11,"value":5.26},{"label":12,"value":5.24},{"label":13,"value":5.28},{"label":14,"value":5.23},{"label":15,"value":5.22},{"label":16,"value":5.28},{"label":17,"value":5.2},{"label":18,"value":5.22},{"label":19,"value":5.24},{"label":20,"value":5.26}],[{"label":1,"value":5.03},{"label":2,"value":5.05},{"label":3,"value":5.03},{"label":4,"value":4.96},{"label":5,"value":4.95},{"label":6,"value":5.01},{"label":7,"value":5.01},{"label":8,"value":4.99},{"label":9,"value":5.03},{"label":10,"value":4.99},{"label":11,"value":4.97},{"label":12,"value":4.95},{"label":13,"value":5},{"label":14,"value":5.02},{"label":15,"value":5},{"label":16,"value":5.01},{"label":17,"value":4.99},{"label":18,"value":5.03},{"label":19,"value":4.99},{"label":20,"value":4.99}]],
       // https://michaelnthiessen.com/force-re-render/
       graphKey: 0,
       graphWidth: 0,

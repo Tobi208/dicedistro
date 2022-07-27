@@ -121,7 +121,7 @@ import d20svg from '@/components/svg/d20.vue'
 import d100svg from '@/components/svg/d100.vue'
 
 export default {
-  name: 'IndexPage',
+  name: 'AdvantagePage',
   components: {
     VueBarGraph,
     d4svg, d6svg, d8svg, d10svg, d12svg, d20svg, d100svg,
@@ -143,12 +143,12 @@ export default {
       shrink: false,
       grow: false,
       calculating: false,
-      sampleSize: 100000,
-      maxY: 0,
+      sampleSize: 1000000,
+      maxY: 10,
       baseDiceConfig,
       i2d: { 0: 4, 1: 6, 2: 8, 3: 10, 4: 12, 5: 20, 6: 100 },
-      diceConfigs: [JSON.parse(JSON.stringify(baseDiceConfig))],
-      graphData: [],
+      diceConfigs: [{"title":"Regular Ability Check","dice":[{"v":4,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":6,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":8,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":10,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":12,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":20,"n":1,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":true},{"v":100,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false}],"minR":1,"maxR":20},{"title":"Ability Check with Advantage","dice":[{"v":4,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":6,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":8,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":10,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":12,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":20,"n":1,"add":true,"rr":0,"rrO":true,"adv":"adv","prevAdv":"adv","dl":0,"mod":0,"active":true},{"v":100,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false}],"minR":1,"maxR":20},{"title":"Ability Check with Disadvantage","dice":[{"v":4,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":6,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":8,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":10,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":12,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false},{"v":20,"n":1,"add":true,"rr":0,"rrO":true,"adv":"disadv","prevAdv":"disadv","dl":0,"mod":0,"active":true},{"v":100,"n":0,"add":true,"rr":0,"rrO":true,"adv":"","prevAdv":"","dl":0,"mod":0,"active":false}],"minR":1,"maxR":20}],
+      graphData: [[{"label":1,"value":4.99},{"label":2,"value":5.01},{"label":3,"value":5},{"label":4,"value":5.01},{"label":5,"value":4.97},{"label":6,"value":4.99},{"label":7,"value":5.01},{"label":8,"value":5},{"label":9,"value":5.01},{"label":10,"value":5.02},{"label":11,"value":5},{"label":12,"value":5.04},{"label":13,"value":4.97},{"label":14,"value":4.98},{"label":15,"value":5.01},{"label":16,"value":4.97},{"label":17,"value":4.99},{"label":18,"value":4.99},{"label":19,"value":5.02},{"label":20,"value":5.01}],[{"label":1,"value":0.25},{"label":2,"value":0.75},{"label":3,"value":1.25},{"label":4,"value":1.73},{"label":5,"value":2.27},{"label":6,"value":2.73},{"label":7,"value":3.27},{"label":8,"value":3.75},{"label":9,"value":4.26},{"label":10,"value":4.75},{"label":11,"value":5.22},{"label":12,"value":5.7},{"label":13,"value":6.24},{"label":14,"value":6.74},{"label":15,"value":7.26},{"label":16,"value":7.8},{"label":17,"value":8.28},{"label":18,"value":8.75},{"label":19,"value":9.23},{"label":20,"value":9.75}],[{"label":1,"value":9.68},{"label":2,"value":9.23},{"label":3,"value":8.78},{"label":4,"value":8.25},{"label":5,"value":7.72},{"label":6,"value":7.23},{"label":7,"value":6.75},{"label":8,"value":6.27},{"label":9,"value":5.74},{"label":10,"value":5.28},{"label":11,"value":4.71},{"label":12,"value":4.26},{"label":13,"value":3.76},{"label":14,"value":3.25},{"label":15,"value":2.77},{"label":16,"value":2.26},{"label":17,"value":1.78},{"label":18,"value":1.27},{"label":19,"value":0.77},{"label":20,"value":0.26}]],
       // https://michaelnthiessen.com/force-re-render/
       graphKey: 0,
       graphWidth: 0,

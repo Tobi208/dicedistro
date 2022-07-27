@@ -20,11 +20,6 @@ export default {
       disabled: false,
     }
   },
-  head() {
-    return {
-      title: 'Feedback',
-    }
-  },
   methods: {
     async submit() {
       if(this.message) {
