@@ -21,10 +21,8 @@
         </div>
 
         <div class="polyhedrons flex-break">
-          <div v-for="(d, index2) in dc.dice" :key="'poly' + index + '' + index2">
-            <label><input v-show="false" v-model="d.active" type="checkbox" @change="updateDC(index)" />
-              <component :is="'d' + i2d[index2] + 'svg'" :class="{polyhedron: true, glow: d.active}" />
-            </label>
+          <div v-for="(d, index2) in dc.dice" :key="'poly' + index + '' + index2" @click="toggleDiceLabel(d, index)">
+              <component :is="'d' + i2d[index2] + 'svg'" :class="{polyhedron: true, glow: d.active}"/>
           </div>
         </div>
 
@@ -394,6 +392,11 @@ export default {
       this.diceConfigs[i].maxR = sumMaxR
     },
 
+    toggleDiceLabel(d, i) {
+      d.active = !d.active
+      this.updateDC(i)
+    }, 
+
 
     // enforce max Rerolls and Drops
 
@@ -697,6 +700,8 @@ main
     width: 100%
     
     .polyhedron
+      min-width: 32px
+      min-height: 32px
       max-width: 32px
       max-height: 32px
   
