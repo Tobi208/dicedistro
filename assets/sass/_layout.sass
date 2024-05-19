@@ -1,0 +1,106 @@
+$light-black: rgb(50, 50, 50)
+$light-color: rgb(180, 120, 240)
+$dark-color: rgb(100, 50, 150)
+$super-dark-color: rgb(75, 25, 125)
+
+@mixin unselectable
+  -webkit-user-select: none 
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+
+@mixin flex-col-layout($gap-size: 15px)
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: $gap-size
+
+*
+  font-family: Helvetica, Arial, sans-serif
+  box-sizing: border-box
+  @include unselectable
+
+html, body, #__nuxt
+  width: 100vw
+  margin: 0
+
+html, body, #__nuxt, #app
+  min-height: 100vh
+
+#__nuxt
+  display: flex
+  justify-content: center
+
+#app
+  display: flex
+  flex-direction: column
+  gap: 15px
+  align-items: center
+  max-width: 1200px
+  width: 100%
+
+header
+  width: 100%
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 10px
+  padding-bottom: 20px
+  margin-bottom: 20px
+
+  border-bottom: 1px solid $light-black
+
+  #h-home
+    text-decoration: none
+
+  #h-title
+    font-family: Verdana, Geneva, Tahoma, sans-serif
+    width: 100%
+    text-align: center
+    padding: 20px 0 20px 0
+    color: $super-dark-color
+    letter-spacing: 2px
+    word-spacing: 7px
+    font-weight: 900
+    font-size: 44px
+    background-image: linear-gradient(to bottom, $super-dark-color, $light-color)
+    color: transparent
+    background-clip: text
+    -webkit-background-clip: text
+
+  #h-links
+    width: 100%
+    display: flex
+    flex-wrap: wrap
+    justify-content: space-evenly
+    gap: 10px
+
+    a
+      color: black
+      font-family: monospace
+
+      &:hover
+        color: $dark-color
+
+main
+  width: 90%
+  @include flex-col-layout
+  padding-bottom: 25px
+  overflow-x: hidden
+  position: relative
+
+footer
+  margin-top: auto
+  border-top: 1px solid $light-black
+  padding: 20px 0
+  width: 100%
+  display: flex
+  justify-content: space-evenly
+  gap: 10px
+  
+  div, a, div a
+    font-family: monospace
+    color: black
+
+input
+  outline: none
