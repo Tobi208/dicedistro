@@ -1,7 +1,5 @@
-const simulate = (data) => {
-  console.log('worker function')
-
-  const [diceConfigs, minRoll, maxRoll, sampleSize] = data
+onmessage = (e) => {
+  const { diceConfigs, minRoll, maxRoll, sampleSize } = JSON.parse(e.data)
 
   let i = 0
   let j = 0
@@ -121,11 +119,6 @@ const simulate = (data) => {
   })
 
   maxY = Math.ceil(maxY)
-  return { newGraphData: graphData, newMaxY: maxY }
-}
 
-self.addEventListener('message', (e) => {
-  console.log('worker listener')
-  const result = simulate(e.data)
-  self.postMessage(result)
-}, false);
+  postMessage(JSON.stringify({ newGraphData: graphData, newMaxY: maxY }))
+}

@@ -16,8 +16,8 @@ const grow = ref(false)
 const calculating = ref(false)
 const sampleSize = ref(100000)
 const i2d = { 0: 4, 1: 6, 2: 8, 3: 10, 4: 12, 5: 20, 6: 100 }
-const diceConfigs = reactive(JSON.parse(JSON.stringify(selectedConfig.diceConfigs)))
-const graphData = reactive(JSON.parse(JSON.stringify(selectedConfig.graphData)))
+const diceConfigs = ref(JSON.parse(JSON.stringify(selectedConfig.diceConfigs)))
+const graphData = ref(JSON.parse(JSON.stringify(selectedConfig.graphData)))
 const maxY = ref(selectedConfig.maxY)
 // https://michaelnthiessen.com/force-re-render/
 const graphKey = ref(0)
@@ -26,20 +26,20 @@ const graphWidth = ref(0)
 const config = ref()
 
 const minRoll = computed(() => {
-  if (diceConfigs.length === 0)
+  if (diceConfigs.value.length === 0)
     return 0
   let min = Number.MAX_SAFE_INTEGER
-  diceConfigs.forEach(dc => {
+  diceConfigs.value.forEach(dc => {
     min = min < dc.minR ? min : dc.minR
   })
   return min
 })
 
 const maxRoll = computed(() => {
-  if (diceConfigs.length === 0)
+  if (diceConfigs.value.length === 0)
     return 0
   let max = Number.MIN_SAFE_INTEGER
-  diceConfigs.forEach(dc => {
+  diceConfigs.value.forEach(dc => {
     max = max > dc.maxR ? max : dc.maxR
   })
   return max
@@ -58,18 +58,18 @@ const filterSampleSize = () => {
 }
 
 const addDC = () => {
-  diceConfigs.push(JSON.parse(JSON.stringify(baseConfig.diceConfigs[0])))
+  diceConfigs.value.push(JSON.parse(JSON.stringify(baseConfig.diceConfigs.value[0])))
 }
 
 const calculate = async () => {
   let i = 0
-  while (i < diceConfigs.length) {
-    if (!diceConfigs[i].minR && !diceConfigs[i].maxR)
-      diceConfigs.splice(i, 1)
+  while (i < diceConfigs.value.length) {
+    if (!diceConfigs.value[i].minR && !diceConfigs.value[i].maxR)
+      diceConfigs.value.splice(i, 1)
     else
       i++
   }
-  if (diceConfigs.length === 0) {
+  if (diceConfigs.value.length === 0) {
     addDC()
     return
   }
@@ -78,22 +78,33 @@ const calculate = async () => {
   await sleep(250)
   calculating.value = true
   grow.value = true
-  graphData = []
+  graphData.value = []
   
-  // https://medium.com/@yinte1222/nuxt3-how-to-use-web-workers-in-a-nuxt-app-d03c1c8f2952
-  const worker = new Worker('/worker.js')
-  worker.postMessage([diceConfigs, minRoll.value, maxRoll.value, sampleSize.value])
-  worker.addEventListener('message', (e) => {
-    if (e.data) {
-      const { newGraphData, newMaxY } = e.data
-      calculating.value = false
-      shrink.value = false
-      grow.value = false
-      maxY.value = newMaxY
-      graphData = [...newGraphData]
-      graphKey.value++
-      worker.terminate()
-    }
+  // https://github.com/mdn/dom-examples/tree/main/web-workers/simple-web-worker
+  const { newGraphData, newMaxY } = await calculate_worker()
+  calculating.value = false
+  shrink.value = false
+  grow.value = false
+  maxY.value = newMaxY
+  graphData.value = [...newGraphData]
+  graphKey.value++
+}
+
+const calculate_worker = () => {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker('worker.js')
+    worker.addEventListener('message', (e) => {
+      if (e.data) {
+          resolve(JSON.parse(e.data))
+          worker.terminate()
+      }
+    }, false)
+    worker.postMessage(JSON.stringify({
+      diceConfigs: diceConfigs.value,
+      minRoll: minRoll.value,
+      maxRoll: maxRoll.value,
+      sampleSize: sampleSize.value
+    }))
   })
 }
 
@@ -101,8 +112,8 @@ const calculate = async () => {
 // --- Dice Config ---
 
 const deleteDC = (i) => {
-  if (diceConfigs.length > 1) {
-    diceConfigs.splice(i, 1)
+  if (diceConfigs.value.length > 1) {
+    diceConfigs.value.splice(i, 1)
     graphData.splice(i, 1)
   }
 }
@@ -113,7 +124,7 @@ const updateDC = (i) => {
   let minR = 0
   let maxR = 0
 
-  diceConfigs[i].dice.forEach(d => {
+  diceConfigs.value[i].dice.forEach(d => {
     if (!d.active || (d.n === 0 && d.mod === 0))
       return
 
@@ -134,8 +145,8 @@ const updateDC = (i) => {
 
   })
 
-  diceConfigs[i].minR = sumMinR
-  diceConfigs[i].maxR = sumMaxR
+  diceConfigs.value[i].minR = sumMinR
+  diceConfigs.value[i].maxR = sumMaxR
 }
 
 const toggleDiceLabel = (d, i) => {
@@ -148,35 +159,35 @@ const toggleDiceLabel = (d, i) => {
 
 const updateD = (i, j) => {
   const mDL = maxDL(i, j)
-  if (diceConfigs[i].dice[j].n > mDL)
-    diceConfigs[i].dice[j].dl = mDL
+  if (diceConfigs.value[i].dice[j].n > mDL)
+    diceConfigs.value[i].dice[j].dl = mDL
 }
 
 
 // number of rolls
 
 const incN = (i, j) => {
-  if (diceConfigs[i].dice[j].n < 99) {
-    diceConfigs[i].dice[j].n++
+  if (diceConfigs.value[i].dice[j].n < 99) {
+    diceConfigs.value[i].dice[j].n++
     updateDC(i)
   }
 }
 const decN = (i, j) => {
-  if (diceConfigs[i].dice[j].n > 0) {
-    diceConfigs[i].dice[j].n--
+  if (diceConfigs.value[i].dice[j].n > 0) {
+    diceConfigs.value[i].dice[j].n--
     updateDC(i)
     updateD(i, j)
   }
 }
 const filterN = (i, j) => {
-  const n = diceConfigs[i].dice[j].v
+  const n = diceConfigs.value[i].dice[j].v
   if (!n.toString().match(/^\d+$/g)) {
-    diceConfigs[i].dice[j].n = 0
+    diceConfigs.value[i].dice[j].n = 0
   } else {
     if (n > 99) {
-      diceConfigs[i].dice[j].n = 99
+      diceConfigs.value[i].dice[j].n = 99
     } else if (n < 0) {
-      diceConfigs[i].dice[j].n = 0
+      diceConfigs.value[i].dice[j].n = 0
     }
     updateDC(i)
     updateD(i, j)
@@ -187,35 +198,35 @@ const filterN = (i, j) => {
 
 const incRR = (i, j) => {
   const mRR = maxRR(i, j)
-  if (diceConfigs[i].dice[j].rr < mRR) {
-    diceConfigs[i].dice[j].rr++
-    if (!diceConfigs[i].dice[j].rrO) {
+  if (diceConfigs.value[i].dice[j].rr < mRR) {
+    diceConfigs.value[i].dice[j].rr++
+    if (!diceConfigs.value[i].dice[j].rrO) {
       updateDC(i)
     }
   }
 }
 const decRR = (i, j) => {
-  if (diceConfigs[i].dice[j].rr > 0) {
-    diceConfigs[i].dice[j].rr--
+  if (diceConfigs.value[i].dice[j].rr > 0) {
+    diceConfigs.value[i].dice[j].rr--
     updateDC(i)
   }
 }
 const filterRR = (i, j) => {
-  const rr = diceConfigs[i].dice[j].rr
+  const rr = diceConfigs.value[i].dice[j].rr
   if (!rr.toString().match(/^\d+$/g)) {
-    diceConfigs[i].dice[j].rr = 0
+    diceConfigs.value[i].dice[j].rr = 0
   } else {
     const mRR = maxRR(i, j)
     if (rr > mRR) {
-      diceConfigs[i].dice[j].rr = mRR
+      diceConfigs.value[i].dice[j].rr = mRR
     } else if (rr < 0) {
-      diceConfigs[i].dice[j].rr = 0
+      diceConfigs.value[i].dice[j].rr = 0
     }
     updateDC(i)
   }
 }
 const maxRR = (i, j) => {
-  return diceConfigs[i].dice[j].v - 1
+  return diceConfigs.value[i].dice[j].v - 1
 }
 
 
@@ -223,59 +234,59 @@ const maxRR = (i, j) => {
 
 const incDL = (i, j) => {
   const mDL = maxDL(i, j)
-  if (diceConfigs[i].dice[j].dl < mDL) {
-    diceConfigs[i].dice[j].dl++
+  if (diceConfigs.value[i].dice[j].dl < mDL) {
+    diceConfigs.value[i].dice[j].dl++
     updateDC(i)
   }
 }
 const decDL = (i, j) => {
-  if (diceConfigs[i].dice[j].dl > 0) {
-    diceConfigs[i].dice[j].dl--
+  if (diceConfigs.value[i].dice[j].dl > 0) {
+    diceConfigs.value[i].dice[j].dl--
     updateDC(i)
   }
 }
 const filterDL = (i, j) => {
-  const dl = diceConfigs[i].dice[j].dl
+  const dl = diceConfigs.value[i].dice[j].dl
   if (!dl.toString().match(/^\d+$/g)) {
-    diceConfigs[i].dice[j].dl = 0
+    diceConfigs.value[i].dice[j].dl = 0
   } else {
     const mDL = maxDL(i, j)
-    if (diceConfigs[i].dice[j].n > mDL) {
-      diceConfigs[i].dice[j].dl = mDL
+    if (diceConfigs.value[i].dice[j].n > mDL) {
+      diceConfigs.value[i].dice[j].dl = mDL
     } else if (dl < 0) {
-      diceConfigs[i].dice[j].dl = 0
+      diceConfigs.value[i].dice[j].dl = 0
     }
     updateDC(i)
   }
 }
 const maxDL = (i, j) => {
-  return diceConfigs[i].dice[j].n > 0 ? diceConfigs[i].dice[j].n - 1 : 0
+  return diceConfigs.value[i].dice[j].n > 0 ? diceConfigs.value[i].dice[j].n - 1 : 0
 }
 
 
 // modifier number
 
 const incMod = (i, j) => {
-  if (diceConfigs[i].dice[j].mod < 99) {
-    diceConfigs[i].dice[j].mod++
+  if (diceConfigs.value[i].dice[j].mod < 99) {
+    diceConfigs.value[i].dice[j].mod++
     updateDC(i)
   }
 }
 const decMod = (i, j) => {
-  if (diceConfigs[i].dice[j].mod > -99) {
-    diceConfigs[i].dice[j].mod--
+  if (diceConfigs.value[i].dice[j].mod > -99) {
+    diceConfigs.value[i].dice[j].mod--
     updateDC(i)
   }
 }
 const filterMod = (i, j) => {
-  const mod = diceConfigs[i].dice[j].mod
+  const mod = diceConfigs.value[i].dice[j].mod
   if (!mod.toString().match(/^-?\d+$/g)) {
-    diceConfigs[i].dice[j].mod = 0
+    diceConfigs.value[i].dice[j].mod = 0
   } else {
     if (mod > 99) {
-      diceConfigs[i].dice[j].mod = 99
+      diceConfigs.value[i].dice[j].mod = 99
     } else if (mod < -99) {
-      diceConfigs[i].dice[j].mod = -99
+      diceConfigs.value[i].dice[j].mod = -99
     }
     updateDC(i)
   }
@@ -285,8 +296,8 @@ const filterMod = (i, j) => {
 // check uncheck advantage
 
 const checkAdv = (i, j, v) => {
-  diceConfigs[i].dice[j].adv = v === diceConfigs[i].dice[j].prevAdv ? '' : v
-  diceConfigs[i].dice[j].prevAdv = diceConfigs[i].dice[j].adv
+  diceConfigs.value[i].dice[j].adv = v === diceConfigs.value[i].dice[j].prevAdv ? '' : v
+  diceConfigs.value[i].dice[j].prevAdv = diceConfigs.value[i].dice[j].adv
 }
 
 const sleep = (ms) => {
