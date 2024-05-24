@@ -47,7 +47,7 @@ const maxRoll = computed(() => {
 
 onMounted(() => {
   // https://stackoverflow.com/questions/46345947/vuejs-get-width-of-div
-  graphWidth.value = config.clientWidth - 50
+  graphWidth.value = config.value.clientWidth - 50
 })
 
 // --- Control Bar ---
@@ -58,7 +58,7 @@ const filterSampleSize = () => {
 }
 
 const addDC = () => {
-  diceConfigs.value.push(JSON.parse(JSON.stringify(baseConfig.diceConfigs.value[0])))
+  diceConfigs.value.push(JSON.parse(JSON.stringify(baseConfig.diceConfigs[0])))
 }
 
 const calculate = async () => {
@@ -114,7 +114,7 @@ const calculate_worker = () => {
 const deleteDC = (i) => {
   if (diceConfigs.value.length > 1) {
     diceConfigs.value.splice(i, 1)
-    graphData.splice(i, 1)
+    graphData.value.splice(i, 1)
   }
 }
 
@@ -311,7 +311,7 @@ const sleep = (ms) => {
     <header>
       <div id="h-title">D&amp;D Dice Distributions</div>
       <div id="h-links">
-        <a href="https://github.com/Tobi208/dicedistro/blob/main/README.md" target="_blank">Help</a>
+        <a href="https://github.com/Tobi208/dicedistro" target="_blank">Help</a>
         <nuxt-link to="?preset=AbilityScores">Ability Scores</nuxt-link>
         <nuxt-link to="?preset=Advantage">Advantage</nuxt-link>
         <nuxt-link to="?preset=BaneBlessInspiration">Bane &amp; Bless &amp; Inspiration</nuxt-link>
@@ -442,7 +442,7 @@ const sleep = (ms) => {
     <footer>
       <div>v0.0.2</div>
       <div>by <a href="https://www.github.com/tobi208" target="_blank">Tobi208</a></div>
-      <div>raise an <a href="https://github.com/Tobi208/dicedistro/issues" target="_blank">Issue</a></div>
+      <div>raise <a href="https://github.com/Tobi208/dicedistro/issues" target="_blank">Issues</a></div>
       <div>seek <a href="https://github.com/Tobi208/dicedistro/blob/main/README.md" target="_blank">Help</a></div>
     </footer>
 </div>
