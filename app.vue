@@ -339,18 +339,18 @@ const sleep = (ms) => {
             <label for="sample-size">Sample Size</label>
             <input id="sample-size" v-model="sampleSize" type="text" @change="filterSampleSize()" />
           </div>
-          <button class="flex-break" @click="calculate()">Simulate Distribution</button>
+          <button @click="calculate()">Simulate Distribution</button>
         </div>
 
         <div v-for="(dc, index) in diceConfigs" :key="'dc' + index" class="dice-config">
 
           <button v-show="diceConfigs.length > 1" class="x" @click="deleteDC(index)">X</button>
 
-          <div v-if="dc.title" class="flex-break" style="font-size: x-large; padding: 5px 10px; margin-bottom: 5px; border-bottom: 1px solid lightgrey; width: 100%">
+          <div v-if="dc.title" style="font-size: x-large; padding: 5px 10px; margin-bottom: 5px; border-bottom: 1px solid lightgrey; width: 100%">
             {{ dc.title }}
           </div>
 
-          <div class="polyhedrons flex-break">
+          <div class="polyhedrons">
             <div @click="toggleDiceLabel(dc.dice[0], index)">
               <svg :class="{polyhedron: true, glow: dc.dice[0].active}" version="1.1" viewBox="0 0 398.12 403.28" xmlns="http://www.w3.org/2000/svg"><g transform="translate(-1.3991)"><g transform="translate(-133.7 -52.851)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="10" style="paint-order:normal"><path d="m140.1 335.1 194.06-277.25v393.28z" style="paint-order:normal"/><path d="m528.22 335.1-194.06-277.25v393.28z" style="paint-order:normal"/></g></g></svg>
             </div>
@@ -376,29 +376,29 @@ const sleep = (ms) => {
 
           <div v-for="(d, index2) in dc.dice" v-show="d.active" :key="'d' + index + '' + index2" class="dice-box">
 
-            <div class="title flex-break">d{{ d.v }}</div>
+            <div class="title">d{{ d.v }}</div>
 
             <div class="number-box roll">
-              <div class="subtitle flex-break">Roll</div>
+              <div class="subtitle">Roll</div>
               <div class="plus-minus-box">
                 <button class="plus" @click="incN(index, index2)">+</button>
                 <button class="minus" @click="decN(index, index2)">&#8212;</button>
               </div>
-              <input v-model="d.n" class="short-number flex-break" @change="filterN(index, index2)" />
+              <input v-model="d.n" class="short-number" @change="filterN(index, index2)" />
               <div class="footer-toggle-box">
                 <label :class="{ selected: !d.add, 'ftb-left': true }"><input v-show="false" v-model="d.add" type="radio" :value="false" @change="updateDC(index)" />Sub</label>
                 <label :class="{ selected: d.add, 'ftb-right': true }"><input v-show="false" v-model="d.add" type="radio" :value="true" @change="updateDC(index)" />Add</label>
               </div>
             </div>
 
-            <div class="number-box reroll flex-break">
-              <div class="subtitle flex-break">Reroll</div>
+            <div class="number-box reroll">
+              <div class="subtitle">Reroll</div>
               <div class="plus-minus-box">
                 <button class="plus" @click="incRR(index, index2)">+</button>
                 <button class="minus" @click="decRR(index, index2)">&#8212;</button>
               </div>
               <p>&#8804;</p>
-              <input v-model="d.rr" type="text" class="short-number flex-break" @change="filterRR(index, index2)" />
+              <input v-model="d.rr" type="text" class="short-number" @change="filterRR(index, index2)" />
               <div class="footer-toggle-box">
                 <label :class="{ selected: !d.rrO, 'ftb-left': true }"><input v-show="false" v-model="d.rrO" type="radio" :value="false" @change="updateDC(index, index2)" />Always</label>
                 <label :class="{ selected: d.rrO, 'ftb-right': true }"><input v-show="false" v-model="d.rrO" type="radio" :value="true" @change="updateDC(index, index2)" />Once</label>
@@ -406,7 +406,7 @@ const sleep = (ms) => {
             </div>
 
             <div class="number-box drop">
-              <div class="subtitle flex-break">Drop</div>
+              <div class="subtitle">Drop</div>
               <div class="plus-minus-box">
                 <button class="plus" @click="incDL(index, index2)">+</button>
                 <button class="minus" @click="decDL(index, index2)">&#8212;</button>
@@ -414,8 +414,8 @@ const sleep = (ms) => {
               <input v-model="d.dl" type="text" class="short-number" @change="filterDL(index, index2)" />
             </div>
 
-            <div class="number-box mod flex-break">
-              <div class="subtitle flex-break">Modifier</div>
+            <div class="number-box mod">
+              <div class="subtitle">Modifier</div>
               <div class="plus-minus-box">
                 <button class="plus" @click="incMod(index, index2)">+</button>
                 <button class="minus" @click="decMod(index, index2)">&#8212;</button>
@@ -423,7 +423,7 @@ const sleep = (ms) => {
               <input v-model="d.mod" type="text" class="short-number" @change="filterMod(index, index2)" />
             </div>
 
-            <div class="advantage footer-toggle-box flex-break">
+            <div class="advantage footer-toggle-box">
               <label :class="{ selected: d.adv === 'disadv', 'ftb-left': true }"><input v-show="false" v-model="d.adv" type="radio" value="disadv" @click="checkAdv(index, index2, 'disadv')" />Disadvantage</label>
               <label :class="{ selected: d.adv === 'adv', 'ftb-right': true }"><input v-show="false" v-model="d.adv" type="radio" value="adv" @click="checkAdv(index, index2, 'adv')" />Advantage</label>
             </div>
@@ -462,13 +462,8 @@ const sleep = (ms) => {
 <style lang="sass">
 
 @use "~/assets/sass/layout"
+@use "~/assets/sass/top_box"
 @use "~/assets/sass/dice_config"
-
-
-// .flex-break
-//   page-break-after: always
-//   break-after: always
-
 
 .rolling-message
   opacity: 0
@@ -503,42 +498,6 @@ const sleep = (ms) => {
 .config.grow
   transform: translateX(100vw)
   transition: none
-
-.top-box
-  @include flex-row-layout($justify: space-evenly)
-  flex-wrap: wrap
-  align-items: center
-  width: 100%
-  padding: 5px
-  font-size: large
-
-  .sample-size input
-    text-align: center
-    padding: 8px
-    border-radius: 20px
-    border: 2px solid $dark-color
-    max-width: 150px
-    outline: none
-    font-size: large
-
-  button
-    min-width: 200px
-    padding: 8px
-    border: 2px solid $dark-color
-    border-radius: 25px
-    font-size: large
-
-    background-color: $dark-color
-    color: white
-    transition: background-color 0.25s ease, color 0.25s ease
-
-    &:active
-      box-shadow: 0 0 3px $light-color
-
-    &:hover
-      cursor: pointer
-      background-color: white
-      color: black
 
 .graph
   width: 100%

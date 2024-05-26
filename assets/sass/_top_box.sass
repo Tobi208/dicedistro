@@ -1,0 +1,66 @@
+$light-black: rgb(50, 50, 50)
+$light-color: rgb(180, 120, 240)
+$dark-color: rgb(100, 50, 150)
+$super-dark-color: rgb(75, 25, 125)
+  
+@mixin unselectable
+  -webkit-user-select: none 
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+
+@mixin flex-col-layout($gap-size: 15px)
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: $gap-size
+
+@mixin flex-row-layout($justify: space-evenly, $gap-size: 15px)
+  display: flex
+  flex-direction: row
+  justify-content: $justify
+  gap: $gap-size
+  
+.top-box
+  @include flex-row-layout($justify: space-evenly)
+  flex-wrap: wrap
+  align-items: center
+  width: 100%
+  padding: 5px
+  font-size: large
+
+  .sample-size
+    display: flex
+    align-items: center
+    gap: 15px
+
+  .sample-size input
+    text-align: center
+    padding: 10px 10px 5px 8px
+    border-radius: 20px
+    border: 2px solid $dark-color
+    max-width: 150px
+    outline: none
+    font-size: large
+
+    line-height: 1
+
+  button
+    min-width: 200px
+    padding: 14px 20px 10px 20px
+    border: 2px solid $dark-color
+    border-radius: 25px
+    font-size: large
+    line-height: 1
+
+    background-color: $dark-color
+    color: white
+    transition: background-color 0.25s ease, color 0.25s ease
+
+    &:active
+      box-shadow: 0 0 3px $light-color
+
+    &:hover
+      cursor: pointer
+      background-color: white
+      color: black
