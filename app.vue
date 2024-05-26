@@ -171,7 +171,7 @@ const toggleDiceLabel = (d, i) => {
 const updateD = (i, j) => {
   const mDL = maxDL(i, j)
   if (diceConfigs.value[i].dice[j].n > mDL)
-    diceConfigs.value[i].dice[j].dl = mDL
+    diceConfigs.value[i].dice[j].dl = Math.min(diceConfigs.value[i].dice[j].dl, mDL)
 }
 
 
