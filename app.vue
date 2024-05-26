@@ -461,13 +461,13 @@ const sleep = (ms) => {
 
 <style lang="sass">
 
-@use "~/assets/sass/dice"
 @use "~/assets/sass/layout"
+@use "~/assets/sass/dice_config"
 
 
-.flex-break
-  page-break-after: always
-  break-after: always
+// .flex-break
+//   page-break-after: always
+//   break-after: always
 
 
 .rolling-message
@@ -539,163 +539,6 @@ const sleep = (ms) => {
       cursor: pointer
       background-color: white
       color: black
-
-.dice-config
-  width: 100%
-  position: relative
-  @include flex-row-layout($justify: center)
-  flex-wrap: wrap
-  padding: 10px
-  border: 2px solid $dark-color
-  border-radius: 15px
-
-  .selected
-    background-color: $light-color
-
-  .x
-    position: absolute
-    top: 10px
-    right: 10px
-    width: 20px
-    height: 20px
-    border: none
-    background-color: $dark-color
-    color: white
-    border-radius: 50%
-    text-align: center
-    font-family: monospace
-
-    &:hover
-      cursor: pointer
-      box-shadow: 0 0 3px $light-color
-
-  .polyhedrons
-    @include flex-row-layout
-    width: 100%
-    
-    .polyhedron
-      min-width: 32px
-      min-height: 32px
-      max-width: 32px
-      max-height: 32px
-  
-      &:hover
-        cursor: pointer
-
-  .dice-box
-    @include flex-row-layout($justify: center)
-    flex-wrap: wrap
-    padding: 10px
-    border: 1px solid $dark-color
-    border-radius: 20px
-    box-shadow: 0 0 2px $light-color
-    max-width: 210px
-
-    .title
-      font-weight: bold
-      text-align: center
-
-    .subtitle
-      text-align: center
-
-    .number-box
-      min-width: 85px
-      max-width: 85px
-      min-height: 85px
-      max-height: 85px
-      @include flex-row-layout($gap-size: 2px, $justify: center)
-      flex-wrap: wrap
-      align-items: center
-
-      .plus-minus-box 
-        display: flex
-        flex-direction: column
-        align-items: center
-
-      .minus, .plus
-        font-size: large
-        font-family: monospace
-        padding: 5px
-        width: 25px
-        height: 25px
-        border: 1px solid $dark-color
-        background-color: white
-
-        transition: background-color 0.15s ease, color 0.15s ease
-
-        &:hover
-          cursor: pointer
-          background-color: $dark-color
-          color: white
-
-        &:active
-          background-color: $light-color
-
-      .minus
-        border-radius: 0 0 50% 50%
-        border-top: none
-
-      .plus
-        border-radius: 50% 50% 0 0
-        border-bottom: none
-
-      input.short-number
-        width: 40px
-        height: 40px
-        text-align: center
-        border-radius: 50%
-        border: 1px solid $dark-color
-
-      .ftb-left, .ftb-right
-        width: 35px
-        font-size: small
-
-    .reroll
-      min-width: 85px
-      max-width: 85px
-
-      .ftb-left, .ftb-right
-        width: 42px
-
-      input.short-number
-        border: none
-        border-bottom: 1px solid $dark-color
-        border-radius: 0
-        height: 20px
-        width: 30px
-
-    .footer-toggle-box
-      display: flex
-      justify-content: center
-      gap: 0
-
-      .ftb-left, .ftb-right
-        border: 1px solid $dark-color
-        padding: 1px
-        text-align: center
-        font-family: monospace
-        transition: background-color 0.15s ease, color 0.15s ease
-
-        &:hover
-          cursor: pointer
-          background-color: $dark-color
-          color: white
-      
-      .ftb-right
-        border-radius: 0 7px 7px 0
-        border-left: none
-
-      .ftb-left
-        border-radius: 7px 0 0 7px
-        border-right: none
-    
-    .advantage
-      
-      .ftb-left, .ftb-right
-        width: 95px
-
-      .ftb-right
-        border-left: 1px solid $light-black
 
 .graph
   width: 100%
