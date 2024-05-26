@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import presets from '~/assets/data/presets.json'
 
 const VueBarChart = resolveComponent('VueBarChart')
@@ -8,8 +8,8 @@ useHead({ title: 'DnD Dice Distro' })
 
 const route = useRoute()
 const baseConfig = presets.Base
-const queryConfig = route.query.preset || 'Base'
-const selectedConfig = presets[queryConfig] || baseConfig
+let queryConfig = route.query.preset || 'Base'
+let selectedConfig = presets[queryConfig] || baseConfig
 
 const shrink = ref(false)
 const grow = ref(false)
@@ -24,6 +24,17 @@ const graphKey = ref(0)
 const graphWidth = ref(0)
 
 const config = ref()
+
+// load a preset when the url changes
+watch(route, async () => {
+  if (route.query.preset) {
+    queryConfig = route.query.preset || 'Base'
+    selectedConfig = presets[queryConfig] || baseConfig
+    diceConfigs.value = JSON.parse(JSON.stringify(selectedConfig.diceConfigs))
+    graphData.value = JSON.parse(JSON.stringify(selectedConfig.graphData))
+    graphKey.value++
+  }
+})
 
 const minRoll = computed(() => {
   if (diceConfigs.value.length === 0)
