@@ -1,0 +1,17 @@
+@mixin unselectable
+  -webkit-user-select: none 
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+
+@mixin flex-col-layout($gap-size: 15px)
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: $gap-size
+
+@mixin flex-row-layout($justify: space-evenly, $gap-size: 15px)
+  display: flex
+  flex-direction: row
+  justify-content: $justify
+  gap: $gap-size
