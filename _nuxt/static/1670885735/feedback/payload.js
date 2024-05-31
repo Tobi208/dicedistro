@@ -1,1 +1,0 @@
-__NUXT_JSONP__("/feedback", {data:[{}],fetch:{},mutations:void 0});

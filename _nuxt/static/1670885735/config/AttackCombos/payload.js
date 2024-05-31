@@ -1,1 +1,0 @@
-__NUXT_JSONP__("/config/AttackCombos", {data:[{}],fetch:{},mutations:void 0});
